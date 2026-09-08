@@ -1,7 +1,7 @@
 import React from "react";
 import ReactPlayer from "react-player/youtube";
 import Moment from "react-moment";
-import ReactHtmlParser from "react-html-parser";
+import { renderHtml } from "../utils/renderHtml";
 
 const Featured = ({ item }) => (
 	<>
@@ -27,7 +27,7 @@ const Featured = ({ item }) => (
 				<h3>
 					Updated on <Moment format="MMM DD, YYYY">{item.date}</Moment>
 				</h3>
-				<p>{ReactHtmlParser(item.description)}</p>{" "}
+				<div>{renderHtml(item.description)}</div>{" "}
 				{/* Parse html description. */}
 			</div>
 		</div>
