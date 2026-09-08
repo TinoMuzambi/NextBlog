@@ -2,17 +2,35 @@ import StoryblokClient from "storyblok-js-client";
 
 import { titleCase } from "./helpers";
 
-// const BASE_URL = "https://api.storyblok.com/v1/cdn";
-const Storyblok = new StoryblokClient({
-	accessToken: process.env.REACT_APP_STORYBLOK_KEY,
-	cache: {
-		clear: "auto",
-		type: "memory",
-	},
-});
+let storyblokClient;
+
+const getStoryblokClient = () => {
+	if (typeof window !== "undefined") {
+		throw new Error("Storyblok content must be loaded on the server");
+	}
+
+	const accessToken = process.env.STORYBLOK_ACCESS_TOKEN;
+	if (!accessToken) {
+		throw new Error("STORYBLOK_ACCESS_TOKEN is not configured");
+	}
+
+	if (!storyblokClient) {
+		storyblokClient = new StoryblokClient({
+			accessToken,
+			cache: {
+				clear: "auto",
+				type: "memory",
+			},
+		});
+	}
+
+	return storyblokClient;
+};
+
 let version;
 const getSpaceVersion = async () => {
-	await Storyblok.get("cdn/spaces/me")
+	await getStoryblokClient()
+		.get("cdn/spaces/me")
 		.then((response) => {
 			version = response.data.space.version;
 		})
@@ -23,7 +41,7 @@ export const getBlogs = async () => {
 	await getSpaceVersion();
 	let prettyBlogs = [];
 
-	await Storyblok.get("cdn/stories?starts_with=blogs/", {
+	await getStoryblokClient().get("cdn/stories?starts_with=blogs/", {
 		sort_by: "content.date:desc",
 		cv: version,
 	})
@@ -56,7 +74,8 @@ export const getCategories = async () => {
 	await getSpaceVersion();
 	let prettyCats = [];
 
-	await Storyblok.get("cdn/stories?starts_with=categories/", { cv: version })
+	await getStoryblokClient()
+		.get("cdn/stories?starts_with=categories/", { cv: version })
 		.then((response) => {
 			const strictlyCats = response.data.stories;
 			prettyCats = strictlyCats.map((cat) => ({
@@ -78,7 +97,8 @@ export const getFeatured = async () => {
 	await getSpaceVersion();
 	let prettyFeat = {};
 
-	await Storyblok.get("cdn/stories/featured-item/", { cv: version })
+	await getStoryblokClient()
+		.get("cdn/stories/featured-item/", { cv: version })
 		.then((response) => {
 			const strictlyFeat = response.data.story.content;
 			prettyFeat = {
@@ -99,7 +119,8 @@ export const getCategory = async (query) => {
 	let category = {};
 	await getSpaceVersion();
 
-	await Storyblok.get(`cdn/stories/categories/${query}`, { cv: version })
+	await getStoryblokClient()
+		.get(`cdn/stories/categories/${query}`, { cv: version })
 		.then((response) => {
 			const strictlyCat = response.data.story.content;
 			const prettyCats = {
@@ -122,7 +143,8 @@ export const getCategory = async (query) => {
 export const getBlog = async (query) => {
 	let blog = {};
 
-	await Storyblok.get(`cdn/stories/blogs/${query}`, {})
+	await getStoryblokClient()
+		.get(`cdn/stories/blogs/${query}`, {})
 		.then((response) => {
 			const strictlyBlog = response.data.story.content;
 			const prettyBlogs = {
