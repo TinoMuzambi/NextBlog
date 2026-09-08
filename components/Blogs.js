@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 import Link from "next/link";
 import Moment from "react-moment";
-import ReactHtmlParser from "react-html-parser";
+import { renderHtml } from "../utils/renderHtml";
 import Pagination from "../components/Pagination";
 
 const Blogs = ({ blogs, category, blogsRef }) => {
@@ -83,7 +83,7 @@ const Blogs = ({ blogs, category, blogsRef }) => {
 										<Link href={`/blogs/${blog.url}`}>
 											<a>
 												{blog.title}
-												{ReactHtmlParser(
+												{renderHtml(
 													blog.content.slice(0, blog.content.indexOf("<br>")) +
 														"</p>"
 												)}{" "}

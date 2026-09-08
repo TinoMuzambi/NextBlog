@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { FaUser, FaCalendar } from "react-icons/fa";
 import Moment from "react-moment";
-import ReactHtmlParser from "react-html-parser";
+import { renderHtml } from "../../utils/renderHtml";
 
 import Preload from "../../components/Preload";
 import Disqus from "../../components/Disqus";
@@ -73,7 +73,7 @@ const Blog = ({ blog, categories, blogs }) => {
 									</div>
 								</div>
 							</div>
-							<div className="blog-html">{ReactHtmlParser(blog.content)}</div>
+							<div className="blog-html">{renderHtml(blog.content)}</div>
 							{/* Parsing HTML blog content */}
 						</div>
 
